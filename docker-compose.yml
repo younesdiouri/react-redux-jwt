@@ -1,0 +1,46 @@
+version: '3.1'
+
+services:
+  server:
+    build: './server'
+    volumes:
+        - './server:/home/node/app'
+    working_dir: '/home/node/app'
+    environment:
+       MONGODB_USER: "root"
+       MONGODB_PWD: "password"
+       MONGODB_DBNAME: "SampleCollections"
+       JWT_SECRET: "MyBestSecret"
+    ports:
+        - '127.0.0.1:3000:3000'
+    command: 'npm start'
+
+  client:
+    build: './client'
+    volumes:
+        - './client:/home/node/app'
+    environment: 
+      CHOKIDAR_USEPOLLING: 'true'
+    working_dir: '/home/node/app'
+    ports:
+        - '127.0.0.1:3001:3000'
+    command: 'yarn start'
+
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - ./SampleCollections:/usr/local/sampleCollections
+    working_dir: /usr/local/sampleCollections
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 127.0.0.1:8088:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
